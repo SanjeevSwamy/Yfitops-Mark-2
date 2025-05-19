@@ -18,24 +18,22 @@ const SongCard: React.FC<SongCardProps> = ({ song, showGenre, onClick }) => {
   
   return (
     <div 
-      className="song-card p-4 rounded-lg cursor-pointer"
+      className="song-card p-3 sm:p-4 rounded-lg cursor-pointer shadow transition hover:shadow-md bg-white dark:bg-gray-900"
       onClick={onClick}
     >
       <img 
         src={song.image} 
         alt={`${song.title} cover`} 
-        className="w-full aspect-square object-cover rounded-md mb-4"
+        className="w-full aspect-square object-cover rounded-md mb-3 sm:mb-4"
       />
-      <h3 className="text-base font-bold truncate">{song.title}</h3>
+      <h3 className="text-base sm:text-lg font-bold truncate">{song.title}</h3>
       <p className="text-sm text-muted truncate">{song.artist}</p>
-      
       {showGenre && song.genre && (
         <p className="text-xs mt-1" style={{ color: 'var(--accent-color)' }}>
           Genre: {song.genre}
         </p>
       )}
-      
-      <div className="star-rating-display mt-2">
+      <div className="star-rating-display mt-2 flex">
         {Array(5).fill(0).map((_, index) => (
           <Star
             key={index}
