@@ -18,7 +18,7 @@
   --error-color: #cc0000;
 }
 
-[data-theme="dark"] {
+.dark {
   --bg-primary: #121212;
   --bg-secondary: #181818;
   --bg-tertiary: #282828;
@@ -37,6 +37,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Gotham', 'Helvetica Neue', Arial, sans-serif;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* Utility Classes */
@@ -284,4 +285,48 @@ body {
 .sidebar-button.active {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
+}
+
+/* Responsive layout helpers */
+.main-app-container {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 640px) {
+  .main-app-container {
+    flex-direction: row;
+  }
+}
+.sidebar-container {
+  width: 16rem;
+  flex-shrink: 0;
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+}
+.main-content {
+  flex: 1 1 0%;
+  padding: 1.5rem;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
