@@ -26,7 +26,8 @@ const MainApp: React.FC = () => {
     isOpen: false,
     songData: null as any
   });
-  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar state
+
   useEffect(() => {
     const getUser = async () => {
       const user = await getCurrentUser();
@@ -48,9 +49,10 @@ const MainApp: React.FC = () => {
       showGenreTracks('home');
     }
   }, [genreName]);
-  
+
   const handleGenreSelect = (genre: string) => {
     showGenreTracks(genre);
+    setIsSidebarOpen(false); // Close sidebar on mobile after selection
   };
   
   const handleRefresh = () => {
@@ -68,7 +70,6 @@ const MainApp: React.FC = () => {
     }
     
     if (trackOverlay.isOpen && trackOverlay.songData) {
-      // Force overlay to refresh reviews if open
       setTrackOverlay({
         ...trackOverlay,
         isOpen: true
@@ -105,43 +106,55 @@ const MainApp: React.FC = () => {
   };
   
   return (
-    <div className="flex w-full">
-      <Sidebar 
-        genres={genres} 
-        onGenreSelect={handleGenreSelect} 
+    <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* Mobile sidebar overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity ${
+          isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsSidebarOpen(false)}
       />
       
-      <div className="flex-1 p-6 overflow-y-auto scrollbar-hide">
+      {/* Sidebar */}
+      <Sidebar 
+        genres={genres} 
+        onGenreSelect={handleGenreSelect}
+        open={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+      
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header 
           userEmail={userEmail} 
-          onClearReviews={handleClearReviews} 
+          onClearReviews={handleClearReviews}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
         />
         
-        <GenreInfo
-          title={getGenreTitle()}
-          description={getGenreDescription()}
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing || loading}
-        />
-        
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
-          </div>
-        ) : error ? (
-          <div 
-            className="text-center py-20" 
-            style={{ color: 'var(--error-color)' }}
-          >
-            {error}
-          </div>
-        ) : (
-          <SongList 
-            songs={songs} 
-            showGenre={selectedGenre === 'home'}
-            onSongClick={handleSongClick}
+        <main className="flex-1 overflow-auto p-4 sm:p-6">
+          <GenreInfo
+            title={getGenreTitle()}
+            description={getGenreDescription()}
+            onRefresh={handleRefresh}
+            isRefreshing={isRefreshing || loading}
           />
-        )}
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 text-red-500 dark:text-red-400">
+              {error}
+            </div>
+          ) : (
+            <SongList 
+              songs={songs} 
+              showGenre={selectedGenre === 'home'}
+              onSongClick={handleSongClick}
+            />
+          )}
+        </main>
       </div>
       
       <TrackOverlay 
