@@ -28,7 +28,6 @@ const MainApp: React.FC = () => {
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Existing user session logic
   useEffect(() => {
     const getUser = async () => {
       const user = await getCurrentUser();
@@ -37,7 +36,6 @@ const MainApp: React.FC = () => {
     getUser();
   }, []);
 
-  // Existing genre handling logic
   useEffect(() => {
     if (genreName) {
       const matchedGenre = genres.find(g => g.toLowerCase() === genreName.toLowerCase());
@@ -47,25 +45,18 @@ const MainApp: React.FC = () => {
     }
   }, [genreName]);
 
-  // Existing refresh logic
   const handleRefresh = () => {
     setIsRefreshing(true);
     refreshCurrentGenre();
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  // Existing review handling logic
   const handleClearReviews = () => {
     const reviewKeys = Object.keys(localStorage).filter(key => key.startsWith('reviews-'));
     reviewKeys.forEach(key => localStorage.removeItem(key));
-    
-    if (trackOverlay.isOpen) {
-      setTrackOverlay(prev => ({ ...prev }));
-    }
     alert('All reviews cleared!');
   };
 
-  // Existing track overlay logic
   const handleSongClick = (song: any) => {
     setTrackOverlay({
       isOpen: true,
@@ -80,17 +71,8 @@ const MainApp: React.FC = () => {
     });
   };
 
-  // Genre display helpers
-  const getGenreTitle = () => 
-    selectedGenre === 'home' ? 'Discover Music' : selectedGenre;
-
-  const getGenreDescription = () =>
-    selectedGenre === 'home' 
-      ? "Explore tracks from various genres and find your next favorite song!" 
-      : genreDescriptions[selectedGenre] || '';
-
   return (
-    <div className="flex flex-col sm:flex-row min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col sm:flex-row min-h-screen bg-primary">
       {/* Mobile Sidebar Overlay */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity ${
@@ -121,18 +103,20 @@ const MainApp: React.FC = () => {
         <main className="flex-1 overflow-auto p-4 sm:p-6">
           <div className="max-w-7xl mx-auto">
             <GenreInfo
-              title={getGenreTitle()}
-              description={getGenreDescription()}
+              title={selectedGenre === 'home' ? 'Discover Music' : selectedGenre}
+              description={selectedGenre === 'home' 
+                ? "Explore tracks from various genres and find your next favorite song!" 
+                : genreDescriptions[selectedGenre] || ''}
               onRefresh={handleRefresh}
               isRefreshing={isRefreshing || loading}
             />
 
             {loading ? (
               <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"/>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"/>
               </div>
             ) : error ? (
-              <div className="text-center py-20 text-red-500 dark:text-red-400">
+              <div className="text-center py-20 text-error">
                 {error}
               </div>
             ) : (
