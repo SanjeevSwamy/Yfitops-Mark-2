@@ -6,12 +6,14 @@ const AuthPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<'login' | 'signup'>('login');
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center login-container z-10">
-      {currentView === 'login' ? (
-        <Login onSwitchToSignup={() => setCurrentView('signup')} />
-      ) : (
-        <Signup onSwitchToLogin={() => setCurrentView('login')} />
-      )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-6">
+      <div className="w-full max-w-sm mx-auto">
+        {currentView === 'login' ? (
+          <Login onSwitchToSignup={() => setCurrentView('signup')} />
+        ) : (
+          <Signup onSwitchToLogin={() => setCurrentView('login')} />
+        )}
+      </div>
     </div>
   );
 };
