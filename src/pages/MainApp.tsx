@@ -26,138 +26,127 @@ const MainApp: React.FC = () => {
     isOpen: false,
     songData: null as any
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Existing user session logic
   useEffect(() => {
     const getUser = async () => {
       const user = await getCurrentUser();
-      if (user) {
-        setUserEmail(user.email || 'User');
-      }
+      setUserEmail(user?.email || '');
     };
-    
     getUser();
   }, []);
-  
+
+  // Existing genre handling logic
   useEffect(() => {
     if (genreName) {
       const matchedGenre = genres.find(g => g.toLowerCase() === genreName.toLowerCase());
-      if (matchedGenre) {
-        showGenreTracks(matchedGenre);
-      }
+      matchedGenre ? showGenreTracks(matchedGenre) : showGenreTracks('home');
     } else {
       showGenreTracks('home');
     }
   }, [genreName]);
 
-  const handleGenreSelect = (genre: string) => {
-    showGenreTracks(genre);
-    setIsSidebarOpen(false); // Close sidebar on mobile after selection
-  };
-  
+  // Existing refresh logic
   const handleRefresh = () => {
     setIsRefreshing(true);
     refreshCurrentGenre();
     setTimeout(() => setIsRefreshing(false), 500);
   };
-  
+
+  // Existing review handling logic
   const handleClearReviews = () => {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('reviews-')) {
-        localStorage.removeItem(key);
-      }
-    }
+    const reviewKeys = Object.keys(localStorage).filter(key => key.startsWith('reviews-'));
+    reviewKeys.forEach(key => localStorage.removeItem(key));
     
-    if (trackOverlay.isOpen && trackOverlay.songData) {
-      setTrackOverlay({
-        ...trackOverlay,
-        isOpen: true
-      });
+    if (trackOverlay.isOpen) {
+      setTrackOverlay(prev => ({ ...prev }));
     }
-    
-    alert('All reviews have been cleared!');
+    alert('All reviews cleared!');
   };
-  
+
+  // Existing track overlay logic
   const handleSongClick = (song: any) => {
     setTrackOverlay({
       isOpen: true,
       songData: song
     });
   };
-  
+
   const closeTrackOverlay = () => {
     setTrackOverlay({
       isOpen: false,
       songData: null
     });
   };
-  
-  const getGenreTitle = () => {
-    if (selectedGenre === 'home') return 'Discover Music';
-    return selectedGenre;
-  };
-  
-  const getGenreDescription = () => {
-    if (selectedGenre === 'home') {
-      return "Explore tracks from various genres and find your next favorite song!";
-    }
-    return genreDescriptions[selectedGenre] || '';
-  };
-  
+
+  // Genre display helpers
+  const getGenreTitle = () => 
+    selectedGenre === 'home' ? 'Discover Music' : selectedGenre;
+
+  const getGenreDescription = () =>
+    selectedGenre === 'home' 
+      ? "Explore tracks from various genres and find your next favorite song!" 
+      : genreDescriptions[selectedGenre] || '';
+
   return (
-    <div className="flex flex-col sm:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Mobile sidebar overlay */}
+    <div className="flex flex-col sm:flex-row min-h-screen bg-white dark:bg-gray-900">
+      {/* Mobile Sidebar Overlay */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity ${
           isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsSidebarOpen(false)}
       />
-      
+
       {/* Sidebar */}
-      <Sidebar 
-        genres={genres} 
-        onGenreSelect={handleGenreSelect}
+      <Sidebar
+        genres={genres}
+        onGenreSelect={(genre) => {
+          showGenreTracks(genre);
+          setIsSidebarOpen(false);
+        }}
         open={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
-      
-      {/* Main content */}
+
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header 
-          userEmail={userEmail} 
+        <Header
+          userEmail={userEmail}
           onClearReviews={handleClearReviews}
           onOpenSidebar={() => setIsSidebarOpen(true)}
         />
-        
+
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          <GenreInfo
-            title={getGenreTitle()}
-            description={getGenreDescription()}
-            onRefresh={handleRefresh}
-            isRefreshing={isRefreshing || loading}
-          />
-          
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20 text-red-500 dark:text-red-400">
-              {error}
-            </div>
-          ) : (
-            <SongList 
-              songs={songs} 
-              showGenre={selectedGenre === 'home'}
-              onSongClick={handleSongClick}
+          <div className="max-w-7xl mx-auto">
+            <GenreInfo
+              title={getGenreTitle()}
+              description={getGenreDescription()}
+              onRefresh={handleRefresh}
+              isRefreshing={isRefreshing || loading}
             />
-          )}
+
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"/>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20 text-red-500 dark:text-red-400">
+                {error}
+              </div>
+            ) : (
+              <SongList
+                songs={songs}
+                showGenre={selectedGenre === 'home'}
+                onSongClick={handleSongClick}
+              />
+            )}
+          </div>
         </main>
       </div>
-      
-      <TrackOverlay 
+
+      <TrackOverlay
         isOpen={trackOverlay.isOpen}
         onClose={closeTrackOverlay}
         songData={trackOverlay.songData}
