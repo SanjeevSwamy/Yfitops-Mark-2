@@ -1,0 +1,287 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light/Dark Mode Theme Variables */
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #EEEEEE;
+  --text-primary: #121212;
+  --text-secondary: #555555;
+  --text-muted: #777777;
+  --accent-color: #1DB954;
+  --card-bg: #F5F5F5;
+  --card-hover: #EEEEEE;
+  --sidebar-bg: #F0F0F0;
+  --input-bg: #E5E5E5;
+  --error-color: #cc0000;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #121212;
+  --bg-secondary: #181818;
+  --bg-tertiary: #282828;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B3B3B3;
+  --text-muted: #909090;
+  --accent-color: #1DB954;
+  --card-bg: #181818;
+  --card-hover: #282828;
+  --sidebar-bg: #000000;
+  --input-bg: #333333;
+  --error-color: #ff5555;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Gotham', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Utility Classes */
+.sidebar {
+  background-color: var(--sidebar-bg);
+  color: var(--text-primary);
+}
+
+.song-card {
+  background-color: var(--card-bg);
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.song-card:hover {
+  background-color: var(--card-hover);
+  transform: translateY(-5px);
+}
+
+.spotify-button {
+  background-color: var(--accent-color);
+  color: #000000;
+  font-weight: bold;
+  border-radius: 30px;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+  border: none;
+  text-transform: none;
+}
+
+.spotify-button:hover {
+  background-color: #1ed760;
+  transform: scale(1.05);
+}
+
+.ghost-button {
+  background-color: transparent;
+  color: var(--text-primary);
+  font-weight: bold;
+  border-radius: 30px;
+  padding: 10px 22px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--bg-tertiary);
+}
+
+.ghost-button:hover {
+  border-color: var(--text-primary);
+  transform: scale(1.05);
+}
+
+.user-menu {
+  background-color: var(--bg-tertiary);
+  border-radius: 30px;
+  transition: all 0.2s ease;
+}
+
+.user-menu:hover {
+  background-color: var(--card-hover);
+}
+
+.dropdown-menu {
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.dropdown-menu a {
+  color: var(--text-primary);
+}
+
+.dropdown-menu a:hover {
+  background-color: var(--card-hover);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.genre-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.review-textarea {
+  background-color: var(--bg-tertiary);
+  border: none;
+  border-radius: 4px;
+  color: var(--text-primary);
+  padding: 10px;
+  transition: all 0.2s;
+}
+
+.review-textarea:focus {
+  outline: none;
+  background-color: var(--card-hover);
+}
+
+.review-card {
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--card-hover);
+}
+
+/* Refresh button */
+.refresh-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refresh-button:hover {
+  background-color: var(--card-hover);
+}
+
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  padding: 24px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Star rating styles */
+.rating {
+  display: flex;
+  margin: 20px 0;
+  justify-content: center;
+}
+
+.rating__star {
+  font-size: 24px;
+  cursor: pointer;
+  color: #dabd18b2;
+  margin: 0 5px;
+}
+
+.star-rating-display {
+  display: flex;
+  margin-top: 8px;
+}
+
+.star-rating-display i {
+  color: #dabd18b2;
+  margin-right: 2px;
+  font-size: 14px;
+}
+
+/* Login page styles */
+.login-container {
+  background: linear-gradient(to bottom, var(--accent-color), var(--bg-primary));
+}
+
+.login-form {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.login-input {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+/* Sidebar button styles */
+.sidebar-button {
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.sidebar-button:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.sidebar-button.active {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
