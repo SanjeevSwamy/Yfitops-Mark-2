@@ -13,28 +13,22 @@ export const useTheme = () => useContext(ThemeContext);
 
 type ThemeProviderProps = {
   children: ReactNode;
-  initialTheme?: Theme; // For SSR/SSG compatibility
 };
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialTheme }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const getInitialTheme = (): Theme => {
-    if (typeof window !== 'undefined') {
-      // 1. Check for saved theme
-      const savedTheme = localStorage.getItem('theme') as Theme;
-      if (savedTheme) return savedTheme;
-      
-      // 2. Check for system preference
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return systemDark ? 'dark' : 'light';
-    }
-    return initialTheme || 'dark'; // Fallback for SSR
+    if (typeof window === 'undefined') return 'dark';
+    
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    if (savedTheme) return savedTheme;
+    
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
 
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const isDark = theme === 'dark';
 
   const applyTheme = useCallback((newTheme: Theme) => {
-    // Update class list immediately
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(newTheme);
@@ -42,32 +36,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
     localStorage.setItem('theme', newTheme);
   }, []);
 
-  // Initial theme application (prevents FOUC)
   useEffect(() => {
     applyTheme(theme);
-  }, [applyTheme, theme]);
+  }, [theme, applyTheme]);
 
-  // Watch for system theme changes (optional)
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
     const handleSystemChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) { // Only react if no manual preference
+      if (!localStorage.getItem('theme')) {
         setTheme(e.matches ? 'dark' : 'light');
       }
     };
-
     mediaQuery.addEventListener('change', handleSystemChange);
     return () => mediaQuery.removeEventListener('change', handleSystemChange);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => {
-      const newTheme = prev === 'dark' ? 'light' : 'dark';
-      applyTheme(newTheme);
-      return newTheme;
-    });
-  }, [applyTheme]);
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
