@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { genres, sampleTracks } from '../data/genres';
 
 type Song = {
@@ -18,176 +18,129 @@ export const useMusic = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string>('home');
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Simulate API fetch with the sample data
-        const tracksData: Cache = {};
-        
-        for (const genre of genres) {
-          tracksData[genre] = sampleTracks[genre as keyof typeof sampleTracks].map(song => ({
-            ...song,
-            genre
-          }));
-        }
-        
-        setLoadedTracks(tracksData);
-        
-        // Set up random tracks for home page
-        const allSongs: Song[] = [];
-        genres.forEach(genre => {
-          if (tracksData[genre]) {
-            tracksData[genre].forEach(song => {
-              allSongs.push({
-                ...song,
-                genre
-              });
-            });
-          }
-        });
-        
-        if (allSongs.length === 0) {
-          throw new Error('No tracks found. Check your data source.');
-        }
-        
-        const shuffledSongs = [...allSongs].sort(() => 0.5 - Math.random());
-        const randomSelection = shuffledSongs.slice(0, 12);
-        
-        setCurrentTracks({
-          ...currentTracks,
-          'random': randomSelection
-        });
-      } catch (err: any) {
-        setError(err.message || 'Failed to load music data');
-        console.error('Error loading music data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Memoized data loader
+  const loadInitialData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     
-    loadInitialData();
+    try {
+      const tracksData: Cache = {};
+      
+      // Load sample tracks synchronously
+      for (const genre of genres) {
+        tracksData[genre] = sampleTracks[genre as keyof typeof sampleTracks].map(song => ({
+          ...song,
+          genre
+        }));
+      }
+      
+      setLoadedTracks(tracksData);
+      
+      // Set up initial random tracks
+      const allSongs: Song[] = [];
+      genres.forEach(genre => {
+        if (tracksData[genre]) {
+          tracksData[genre].forEach(song => {
+            allSongs.push({ ...song, genre });
+          });
+        }
+      });
+
+      if (allSongs.length === 0) {
+        throw new Error('No tracks found. Check your data source.');
+      }
+
+      const shuffledSongs = [...allSongs].sort(() => 0.5 - Math.random());
+      const randomSelection = shuffledSongs.slice(0, 12);
+
+      setCurrentTracks(prev => ({
+        ...prev,
+        'random': randomSelection
+      }));
+      setDataLoaded(true);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load music data');
+      console.error('Error loading music data:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const showGenreTracks = (genre: string) => {
+  useEffect(() => {
+    if (!dataLoaded) {
+      loadInitialData();
+    }
+  }, [dataLoaded, loadInitialData]);
+
+  const refreshData = useCallback(() => {
+    setDataLoaded(false);
+  }, []);
+
+  const showGenreTracks = useCallback((genre: string) => {
     setLoading(true);
     setError(null);
     setSelectedGenre(genre);
-    
+
     setTimeout(() => {
       try {
         if (genre === 'home') {
-          // Home should show random tracks from all genres
-          if (currentTracks['random']) {
-            setLoading(false);
-            return;
+          if (!currentTracks.random) {
+            refreshData();
           }
-          
-          const allSongs: Song[] = [];
-          genres.forEach(g => {
-            if (loadedTracks[g]) {
-              loadedTracks[g].forEach(song => {
-                allSongs.push({
-                  ...song,
-                  genre: g
-                });
-              });
-            }
-          });
-          
-          if (allSongs.length === 0) {
-            throw new Error('No tracks found. Check your data source.');
-          }
-          
-          const shuffledSongs = [...allSongs].sort(() => 0.5 - Math.random());
-          const randomSelection = shuffledSongs.slice(0, 12);
-          
-          setCurrentTracks({
-            ...currentTracks,
-            'random': randomSelection
-          });
         } else {
-          // Show specific genre tracks
-          if (!loadedTracks[genre] || loadedTracks[genre].length === 0) {
+          if (!loadedTracks[genre]?.length) {
             throw new Error(`No tracks found for ${genre}. Check your data source.`);
           }
-          
-          if (!currentTracks[genre]) {
-            setCurrentTracks({
-              ...currentTracks,
-              [genre]: [...loadedTracks[genre]]
-            });
-          }
+
+          setCurrentTracks(prev => ({
+            ...prev,
+            [genre]: [...(loadedTracks[genre] || [])]
+          }));
         }
       } catch (err: any) {
         setError(err.message || `Failed to load ${genre} tracks`);
-        console.error(`Error loading ${genre} tracks:`, err);
       } finally {
         setLoading(false);
       }
-    }, 500); // Simulate loading delay
-  };
+    }, 500);
+  }, [currentTracks, loadedTracks, refreshData]);
 
-  const refreshCurrentGenre = () => {
+  const refreshCurrentGenre = useCallback(() => {
     setLoading(true);
     setError(null);
-    
+
     setTimeout(() => {
       try {
         if (selectedGenre === 'home') {
-          const allSongs: Song[] = [];
-          genres.forEach(genre => {
-            if (loadedTracks[genre]) {
-              loadedTracks[genre].forEach(song => {
-                allSongs.push({
-                  ...song,
-                  genre
-                });
-              });
-            }
-          });
-          
-          if (allSongs.length === 0) {
-            throw new Error('No tracks found. Check your data source.');
-          }
-          
-          const shuffledSongs = [...allSongs].sort(() => 0.5 - Math.random());
-          const randomSelection = shuffledSongs.slice(0, 12);
-          
-          setCurrentTracks({
-            ...currentTracks,
-            'random': randomSelection
-          });
+          refreshData();
         } else {
-          const genreTracks = loadedTracks[selectedGenre];
-          if (!genreTracks || genreTracks.length === 0) {
+          const genreTracks = loadedTracks[selectedGenre] || [];
+          if (!genreTracks.length) {
             throw new Error(`No tracks found for ${selectedGenre}. Check your data source.`);
           }
-          
+
           const shuffledSongs = [...genreTracks].sort(() => 0.5 - Math.random());
-          setCurrentTracks({
-            ...currentTracks,
+          setCurrentTracks(prev => ({
+            ...prev,
             [selectedGenre]: shuffledSongs
-          });
+          }));
         }
       } catch (err: any) {
         setError(err.message || 'Failed to refresh tracks');
-        console.error('Error refreshing tracks:', err);
       } finally {
         setLoading(false);
       }
-    }, 500); // Simulate loading delay
-  };
-  
-  const getCurrentSongs = () => {
+    }, 500);
+  }, [selectedGenre, loadedTracks, refreshData]);
+
+  const getCurrentSongs = useCallback(() => {
     if (selectedGenre === 'home') {
       return currentTracks['random'] || [];
     }
     return currentTracks[selectedGenre] || [];
-  };
+  }, [selectedGenre, currentTracks]);
 
   return {
     genres,
@@ -196,6 +149,7 @@ export const useMusic = () => {
     selectedGenre,
     songs: getCurrentSongs(),
     showGenreTracks,
-    refreshCurrentGenre
+    refreshCurrentGenre,
+    refreshData // Call this after successful auth
   };
 };
