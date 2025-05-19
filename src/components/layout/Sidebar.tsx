@@ -27,59 +27,71 @@ const Sidebar: React.FC<SidebarProps> = ({ genres, onGenreSelect, open = false, 
 
   return (
     <>
+      {/* Overlay for mobile */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity sm:hidden ${
           open ? 'block' : 'hidden'
         }`}
         onClick={onClose}
       />
-      
+
+      {/* Sidebar */}
       <aside
-        className={`fixed z-50 top-0 left-0 h-full w-64 bg-secondary shadow-lg transform transition-transform duration-200
-          ${open ? 'translate-x-0' : '-translate-x-full'} 
-          sm:static sm:translate-x-0`}
+        className={`
+          bg-[var(--sidebar-bg)]
+          h-screen
+          flex-shrink-0
+          w-64
+          p-6
+          z-50
+          fixed top-0 left-0
+          transition-transform duration-200
+          ${open ? 'translate-x-0' : '-translate-x-full'}
+          sm:static sm:block sm:translate-x-0
+          shadow-lg
+        `}
+        style={{ minHeight: '100vh' }}
       >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold text-accent">Yfitops</h1>
-            <button
-              className="sm:hidden p-2 text-muted"
-              onClick={onClose}
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <nav>
-            <button
-              className={`w-full text-left px-4 py-2 rounded-lg mb-2 ${
-                !genreName ? 'bg-tertiary' : 'hover:bg-tertiary'
-              }`}
-              onClick={handleHomeClick}
-            >
-              <div className="flex items-center">
-                <Home className="mr-3" size={18} />
-                <span>Home</span>
-              </div>
-            </button>
-
-            <div className="border-t border-tertiary my-4" />
-
-            <div className="space-y-2">
-              {genres.map(genre => (
-                <button
-                  key={genre}
-                  className={`w-full text-left px-4 py-2 rounded-lg ${
-                    genreName === genre.toLowerCase() ? 'bg-tertiary' : 'hover:bg-tertiary'
-                  }`}
-                  onClick={() => handleGenreClick(genre)}
-                >
-                  {genre}
-                </button>
-              ))}
-            </div>
-          </nav>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-accent">Yfitops</h1>
+          <button
+            className="sm:hidden p-2 text-muted"
+            onClick={onClose}
+            aria-label="Close sidebar"
+          >
+            <X size={20} />
+          </button>
         </div>
+
+        <nav>
+          <button
+            className={`sidebar-button w-full text-left px-4 py-2 rounded-lg mb-2 ${
+              !genreName ? 'active' : ''
+            }`}
+            onClick={handleHomeClick}
+          >
+            <div className="flex items-center">
+              <Home className="mr-3" size={18} />
+              <span>Home</span>
+            </div>
+          </button>
+
+          <div className="border-t border-gray-200 dark:border-gray-800 my-4" />
+
+          <div className="space-y-2">
+            {genres.map(genre => (
+              <button
+                key={genre}
+                className={`sidebar-button w-full text-left px-4 py-2 rounded-lg ${
+                  genreName === genre.toLowerCase() ? 'active' : ''
+                }`}
+                onClick={() => handleGenreClick(genre)}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+        </nav>
       </aside>
     </>
   );
