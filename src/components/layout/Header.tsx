@@ -14,48 +14,48 @@ const Header: React.FC<HeaderProps> = ({ userEmail, onClearReviews, onOpenSideba
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <header className="flex justify-between items-center mb-8 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+    <header className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-tertiary">
       <button
-        className="sm:hidden p-2 text-gray-600 dark:text-gray-400"
+        className="sm:hidden p-2 text-muted"
         onClick={onOpenSidebar}
       >
         <Menu size={24} />
       </button>
 
-      <div className="flex-1" /> {/* Spacer */}
+      <div className="flex-1" />
 
       <div className="flex items-center gap-4">
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="p-2 rounded-lg hover:bg-tertiary"
         >
           {theme === 'dark' ? (
-            <Sun size={20} className="text-gray-800 dark:text-gray-200" />
+            <Sun size={20} className="text-primary" />
           ) : (
-            <Moon size={20} className="text-gray-800 dark:text-gray-200" />
+            <Moon size={20} className="text-primary" />
           )}
         </button>
 
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-tertiary"
           >
-            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <User size={16} className="text-gray-600 dark:text-gray-400" />
+            <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center">
+              <User size={16} className="text-muted" />
             </div>
-            <span className="font-medium dark:text-gray-200">{userEmail}</span>
-            <ChevronDown size={16} className="text-gray-600 dark:text-gray-400" />
+            <span className="text-primary">{userEmail}</span>
+            <ChevronDown size={16} className="text-muted" />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+            <div className="absolute right-0 mt-2 w-48 bg-secondary rounded-lg shadow-xl border border-tertiary">
               <button
                 onClick={() => {
                   onClearReviews();
                   setDropdownOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-tertiary text-primary"
               >
                 Clear All Reviews
               </button>
@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ userEmail, onClearReviews, onOpenSideba
                   signOut();
                   setDropdownOpen(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-tertiary text-primary"
               >
                 Log out
               </button>
